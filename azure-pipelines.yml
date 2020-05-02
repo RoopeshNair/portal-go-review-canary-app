@@ -102,7 +102,7 @@ stages:
                 connectedServiceNameARM: 'build-rn-monitor-alerts'
                 ResourceGroupName: 'build-rn'
                 filterType: 'resource'
-                resource: 'Microsoft.ContainerService/managedClusters/dev'
+                resource: 'microsoft.insights/metricalerts/Pods in ready state impacted'
 
         on:
           failure:
