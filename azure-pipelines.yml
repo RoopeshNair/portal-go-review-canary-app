@@ -49,32 +49,36 @@ stages:
     - upload: manifests
       artifact: manifests
 
-- stage: Deploy
-  displayName: Deploy stage
+- stage: Production
+  displayName: Deploy to Prod
   dependsOn: Build
-
   jobs:
-  - deployment: Deploy
+  - deployment: CanaryDeploy
     condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
-    displayName: Deploy
+    displayName: Prod Canary Deploy
     pool:
       vmImage: $(vmImageName)
     environment: 'portal-go-canary-prod.canary'
     strategy:
-      runOnce:
+      canary:
+        increments: [25]
         deploy:
           steps:
           - task: KubernetesManifest@0
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
+              namespace: 'canary'
               secretName: $(imagePullSecret)
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           - task: KubernetesManifest@0
             displayName: Deploy to Kubernetes cluster
             inputs:
-              action: deploy
+              action: $(strategy.action)
+              namespace: 'canary'
+              strategy: $(strategy.name)
+              percentage: $(strategy.increment)
               manifests: |
                 $(Pipeline.Workspace)/manifests/deployment.yml
                 $(Pipeline.Workspace)/manifests/service.yml
@@ -82,6 +86,34 @@ stages:
                 $(imagePullSecret)
               containers: |
                 $(containerRegistry)/$(imageRepository):$(tag)
+
+        postRouteTraffic:
+          pool: server
+          steps:
+            - task: Delay@1
+              inputs:
+                delayForMinutes: '0'
+
+        on:
+          failure:
+            steps:
+              - script: ecoh deployment failed...
+              - checkout: self
+
+              - task: KubernetesManifest@0
+                displayName: 'rollback deployment'
+                inputs:
+                  action: 'reject'
+                  namespace: 'canary'
+                  strategy: $(strategy.name)
+                  manifests: |
+                    $(Build.SourcesDirectory)/manifests/deployment.yml
+                    $(Build.SourcesDirectory)/manifests/service.yml
+
+          success:
+            steps:
+              - download: none
+              - script: echo deployment succeeded
 
   - deployment: DeployPullRequest
     displayName: Deploy Pull request
