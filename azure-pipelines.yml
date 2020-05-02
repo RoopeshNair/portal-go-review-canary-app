@@ -62,6 +62,9 @@ stages:
     strategy:
       canary:
         increments: [25]
+        preDeploy:
+          steps:
+            - script: echo initialize canary deployment to prod
         deploy:
           steps:
           - task: KubernetesManifest@0
@@ -97,7 +100,7 @@ stages:
         on:
           failure:
             steps:
-              - script: ecoh deployment failed...
+              - script: echo deployment failed...
               - checkout: self
 
               - task: KubernetesManifest@0
