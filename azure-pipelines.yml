@@ -55,7 +55,7 @@ stages:
   jobs:
   - deployment: CanaryDeploy
     condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
-    displayName: /
+    displayName: _
     pool:
       vmImage: $(vmImageName)
     environment: 'portal-go-canary-prod.canary'
