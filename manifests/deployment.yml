@@ -1,9 +1,14 @@
 apiVersion : apps/v1beta1
 kind: Deployment
 metadata:
-  name: portalgocanaryapp 
+  name: portal-go-canary-app 
+  labels:
+    app: portalgocanaryapp
 spec:
-  replicas: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portalgocanaryapp
   template:
     metadata:
       labels:
