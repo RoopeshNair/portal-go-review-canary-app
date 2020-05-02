@@ -97,6 +97,13 @@ stages:
               inputs:
                 delayForMinutes: '0'
 
+            - task: AzureMonitor@1
+              inputs:
+                connectedServiceNameARM: 'build-rn-monitor-alerts'
+                ResourceGroupName: 'build-rn'
+                filterType: 'resource'
+                resource: 'Microsoft.ContainerService/managedClusters/dev'
+
         on:
           failure:
             steps:
