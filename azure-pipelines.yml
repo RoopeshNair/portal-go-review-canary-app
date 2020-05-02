@@ -50,12 +50,12 @@ stages:
       artifact: manifests
 
 - stage: Production
-  displayName: Deploy to Prod
+  displayName: Canary Prod deploy
   dependsOn: Build
   jobs:
   - deployment: CanaryDeploy
     condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
-    displayName: Canary
+    displayName: /
     pool:
       vmImage: $(vmImageName)
     environment: 'portal-go-canary-prod.canary'
