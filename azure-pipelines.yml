@@ -95,7 +95,7 @@ stages:
           steps:
             - task: Delay@1
               inputs:
-                delayForMinutes: '0'
+                delayForMinutes: '.5'
 
             - task: AzureMonitor@1
               inputs:
