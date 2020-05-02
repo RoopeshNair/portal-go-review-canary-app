@@ -1,16 +1,16 @@
 apiVersion : apps/v1beta1
 kind: Deployment
 metadata:
-  name: portalreviewapp 
+  name: portalgocanaryapp 
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: portalreviewapp 
+        app: portalgocanaryapp 
     spec:
       containers:
-        - name: portalreviewapp 
-          image: ronacr.azurecr.io/portalreviewapp
+        - name: portalgocanaryapp 
+          image: ronacr.azurecr.io/portalgocanaryapp
           ports:
           - containerPort: 80
